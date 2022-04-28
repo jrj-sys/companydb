@@ -1,3 +1,8 @@
+DROP DATABASE IF EXISTS companydb;
+CREATE DATABASE companydb;
+USE companydb;
+
+
 CREATE TABLE department (
     id INT PRIMARY KEY,
     name VARCHAR(30)
