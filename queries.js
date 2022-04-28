@@ -1,1 +1,0 @@
-// create SQL query class to make queries easier to construct
