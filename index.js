@@ -27,7 +27,7 @@ const promptManager = () => {
         }
     ])
     .then(menu => {
-        // Destruct the menu Promise into the variable choice
+        // Destruct the promptManager return Promise into the variable choice
         const { choice } = menu;
         // Switch statement to call different functions depending on user choice in main menu
         switch (choice) {
