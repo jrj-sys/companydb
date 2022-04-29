@@ -69,31 +69,67 @@ const promptManager = () => {
 }
 
 
-let viewDepartments = () => {
-    console.log('You chose to View All Departments');
+viewDepartments = () => {
+    console.log(`Pulling all Departments...\n`);
+    let sql = `SELECT department.id AS Id, department.name AS Department FROM department;`;
+
+    db.promise().query(sql)
+        .then( ([rows]) => {
+            console.table(rows)
+            promptManager();
+        })
+        .catch(console.log)
+};
+
+viewRoles = () => {
+    console.log(`Pulling all Roles...\n`);
+    let sql = `SELECT role.id AS Id, role.title AS Title, role.salary AS Salary, department.name AS Department
+                FROM role
+                INNER JOIN department ON role.department_id = department.id;`;
+    
+    db.promise().query(sql)
+        .then( ([rows]) => {
+            console.table(rows);
+            promptManager();
+        })
+        .catch(console.log);
+};
+
+viewEmployees = () => {
+    console.log(`Pulling all Employees...\n`);
+    let sql = `SELECT employee.id AS Id, 
+                employee.first_name AS First_Name, 
+                employee.last_name AS Last_Name, 
+                role.title AS Title, 
+                department.name AS Department,
+                role.salary AS Salary, 
+                CONCAT (manager.first_name, ' ', manager.last_name) AS Manager
+                FROM employee
+                LEFT JOIN role ON employee.role_id = role.id
+                LEFT JOIN department ON role.department_id = department.id
+                LEFT JOIN employee manager ON employee.manager_id = manager.id`;
+    
+    db.promise().query(sql)
+        .then( ([rows]) => {
+            console.table(rows);
+            promptManager();
+        })
+        .catch(console.log);
 }
 
-let viewRoles = () => {
-    console.log('You chose to View All Roles')
-}
-
-let viewEmployees = () => {
-    console.log('You chose to View All Employees');
-}
-
-let addDepartment = () => {
+addDepartment = () => {
     console.log('You chose to Add a Department');
 }
 
-let addRole = () => {
+addRole = () => {
     console.log('Add a role');
 }
 
-let addEmployee = () => {
+addEmployee = () => {
     console.log('Add an employee');
 }
 
-let updateEmployee = () => {
+updateEmployee = () => {
     console.log('Update an Employee');
 }
 
