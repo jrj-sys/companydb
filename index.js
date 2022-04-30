@@ -174,6 +174,7 @@ addRole = () => {
             name: 'salary',
             message: 'What is the salary for your new Role?',
             validate: input => {
+                // validate the input to be a number
                 if (isNaN(input)) {
                     return false;
                 } else {
@@ -183,13 +184,16 @@ addRole = () => {
         }
     ])
     .then(response => {
+        // create params for the query, grab role and salary instantly as these are solely user input
         let params = [response.role, response.salary];
         
+        // query for all available departments so the user can accurately assign an Employee to a department 
         console.log(`Here are a list of available Departments...\n`)
         let deptSql = `SELECT name AS Name, id AS Id FROM department;`
 
         db.promise().query(deptSql)
             .then( ([rows]) => {
+                // map rows array to be able to dynamically retrieve departments so that the user can accurately pick a dept for new Role
                 const dept = rows.map(({ Name, Id }) => ({ name: Name, value: Id }));
 
                 inquirer.prompt([
@@ -309,6 +313,61 @@ addEmployee = () => {
 }
 
 updateEmployee = () => {
-    console.log('Update an Employee');
+    console.log(`Loading Employees...\n`)
+    let employeeSql = `SELECT id as Id, first_name as First_Name, last_name AS Last_Name FROM employee;`;
+
+    db.promise().query(employeeSql)
+        .then( ([rows]) => {
+            let employees = rows.map(({ Id, First_Name, Last_Name }) => ({ name: First_Name + ' ' + Last_Name, value: Id }));
+
+            inquirer.prompt([ 
+                {
+                    type: 'list',
+                    name: 'name',
+                    message: 'Which Employee would you like to update?',
+                    choices: employees
+                }
+            ])
+            .then(employeeChoice => {
+                let params = [];
+                const employee = employeeChoice.name;
+                params.push(employee);
+
+                let roleSql = `SELECT id as Id, title as Title from role;`
+
+                db.promise().query(roleSql)
+                    .then( ([rows]) => {
+                        let roles = rows.map( ({ Id, Title}) => ({ name: Title, value: Id }));
+
+                        inquirer.prompt([
+                            {
+                                type: 'list',
+                                name: 'role',
+                                message: 'What role will the new Employee be taking on?',
+                                choices: roles
+                            }
+                        ])
+                        .then(response => {
+                            let role = response.role
+                            params.push(role);
+
+                            // switch the order of the parameters to match the query
+                            params[0] = role;
+                            params[1] = employee;
+
+                            let sql = `UPDATE employee
+                                        SET role_id = ?
+                                        WHERE id = ?;`
+
+                            db.promise().query(sql, params)
+                                .then( ([rows]) => {
+                                    console.log(`Employee successfully updated! Here are the database changes:\n`)
+                                    console.table(rows);
+                                    promptManager();
+                                })
+                        })
+                    })
+            })
+        })
 }
 
