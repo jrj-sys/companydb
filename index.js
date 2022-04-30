@@ -86,6 +86,7 @@ viewRoles = () => {
     let sql = `SELECT role.id AS Id, role.title AS Title, role.salary AS Salary, department.name AS Department
                 FROM role
                 INNER JOIN department ON role.department_id = department.id;`;
+                
     
     db.promise().query(sql)
         .then( ([rows]) => {
@@ -118,15 +119,193 @@ viewEmployees = () => {
 }
 
 addDepartment = () => {
-    console.log('You chose to Add a Department');
+    console.log(`Please answer the following question...\n`);
+    
+    inquirer.prompt([ 
+        {
+            type: 'input',
+            name: 'department',
+            message: 'What is the name of your new Department?',
+            validate: input => {
+                if (input) {
+                    return true;
+                } else {
+                    console.log(`Please enter the name of your department!`);
+                    return false;
+                }
+            }
+        }
+    ])
+    .then(response => {
+        let { department } = response;
+
+        let sql = `INSERT INTO department (name)
+                    VALUES ('${department}')`;
+
+        db.promise().query(sql)
+            .then( ([rows]) => {
+                console.log(`Department added! Here are the database updates:\n`)
+                console.table(rows);
+                promptManager();
+            })
+    })
+    .catch(console.log);
 }
 
 addRole = () => {
-    console.log('Add a role');
+    console.log(`Please answer the following prompts...\n`);
+
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'role',
+            message: 'What is the title of your new Role?',
+            validate: input => {
+                if (input) {
+                    return true;
+                } else {
+                    console.log('Please enter a Role title!')
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'salary',
+            message: 'What is the salary for your new Role?',
+            validate: input => {
+                if (isNaN(input)) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        }
+    ])
+    .then(response => {
+        let params = [response.role, response.salary];
+        
+        console.log(`Here are a list of available Departments...\n`)
+        let deptSql = `SELECT name AS Name, id AS Id FROM department;`
+
+        db.promise().query(deptSql)
+            .then( ([rows]) => {
+                const dept = rows.map(({ Name, Id }) => ({ name: Name, value: Id }));
+
+                inquirer.prompt([
+                    {
+                    type: 'list',
+                    name: 'department',
+                    message: 'Which Department will this role belong to?',
+                    choices: dept
+                }
+            ])
+            .then(response => {
+                let deptParam = response.department;
+                params.push(deptParam);
+                
+                let sql = `INSERT INTO role (title, salary, department_id)
+                            VALUES (?, ? , ?)`;
+                
+                db.promise().query(sql, params)
+                    .then( ([rows]) => {
+                        console.log(`Role added! Here are the database updates:\n`)
+                        console.table(rows);
+                        promptManager();
+                    })
+            })
+        })
+    })       
 }
 
 addEmployee = () => {
-    console.log('Add an employee');
+    console.log(`Please respond to the following prompts...\n`);
+
+    inquirer.prompt([
+        {
+            type: 'input',
+            name: 'firstName',
+            message: `What is the new Employee's first name?`,
+            validate: input => {
+                if (input) {
+                    return true;
+                } else {
+                    console.log('Please enter an Employee first name!')
+                    return false;
+                }
+            }
+        },
+        {
+            type: 'input',
+            name: 'lastName',
+            message: `What is the new Employee's last name?`,
+            validate: input => {
+                if (input) {
+                    return true;
+                } else {
+                    console.log('Please enter an Employee last name!')
+                    return false;
+                }
+            }
+        }
+    ])
+    .then(response => {
+        params = [response.firstName, response.lastName];
+        
+        console.log(`Here are a list of available employee Roles...\n`)
+        let roleSql = `SELECT title as Title, id as Id FROM role;`
+
+        db.promise().query(roleSql)
+            .then( ([rows]) => {
+                const roles = rows.map(({ Title, Id }) => ({ name: Title, value: Id }))
+
+
+                inquirer.prompt([
+                    {
+                        type: 'list',
+                        name: 'role',
+                        message: 'Which role will your new Employee be taking on?',
+                        choices: roles
+                    }
+            ])
+            .then(response => {
+                const roleParam = response.role
+                params.push(roleParam);
+                
+                console.log(`Here are all available Employees...\n`)
+                let managerSql = `SELECT id as Id, first_name AS First_Name, last_name AS Last_Name
+                                    FROM employee;`
+
+                db.promise().query(managerSql)
+                    .then( ([rows]) => {
+                        const employees = rows.map( ({ First_Name, Last_Name, Id }) => ({ name: First_Name + ' ' + Last_Name, value: Id }))
+                        
+                        inquirer.prompt([
+                            {
+                                type: 'list',
+                                name: 'manager',
+                                message: 'Which Employee will this new Employee be reporting to?',
+                                choices: employees
+                            }
+                        ])
+                        .then(managerChoice => {
+                            let managerParam = managerChoice.manager
+                            params.push(managerParam);
+
+                            let sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id)
+                                        VALUES (?, ?, ?, ?);`
+
+                            db.promise().query(sql, params) 
+                                .then( ([rows]) => {
+                                    console.log(`Employee has successfully been added. Here are the database changes:\n`)
+                                    console.table(rows);
+                                    promptManager();
+                                })
+                        })
+                    })
+            })
+        })
+    })
 }
 
 updateEmployee = () => {
