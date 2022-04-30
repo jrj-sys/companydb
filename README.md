@@ -9,18 +9,15 @@ Command-line application used to manage a company's employee database, using Nod
 2. [Contribution](#Contribution)
 3. [Installation](#Installation)
 4. [Usage](#Usage)
-5. [Tests](#Tests)
 6. [Credits](#Credits)
 ## Installation
 Clone the repository or download the zip file to the directory of your choice. Navigate to this directory in your terminal and run `npm i` to install all dependencies. After all dependencies are installed, you must create a .env file and input `MYSQL_PASSWORD='yourSQLpassword'`. Next, run `node index.js` in your terminal to start the application.
 ## Usage
 A video demonstrating usage can be found [here]().
-## Tests
-The jest framework was used for testing.
 ## Credits
 [Jamel James](https://github.com/jrj-sys)
 ## Made With:
-JavaScript, Node.js, ES6
+JavaScript, Node.js, Inquirer, MySQL, ES6
 ## Contribution 
 Issues can be created at any time [here](https://github.com/jrj-sys/CompanyDB/issues).
 ## Questions
