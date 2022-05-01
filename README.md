@@ -13,7 +13,7 @@ Command-line application used to manage a company's employee database, using Nod
 ## Installation
 Clone the repository or download the zip file to the directory of your choice. Navigate to this directory in your terminal and run `npm i` to install all dependencies. After all dependencies are installed, you must create a .env file and input `MYSQL_PASSWORD='yourSQLpassword'`. Next, run `node index.js` in your terminal to start the application.
 ## Usage
-A video demonstrating usage can be found [here]().
+A video demonstrating usage can be found [here](https://www.youtube.com/watch?v=Or9tJYA8gbA).
 ## Credits
 [Jamel James](https://github.com/jrj-sys)
 ## Made With:
