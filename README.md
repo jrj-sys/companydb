@@ -3,7 +3,7 @@
 ![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)
 
 ## Description
-Command-line application used to manage a company's employee database, using Node.js, Inquirer, and MySQL.
+Command-line application used to manage a company's employee database using Node.js, Inquirer, and MySQL.
 ## Table of Contents
 1. [Questions or Issues](#Questions)
 2. [Contribution](#Contribution)
